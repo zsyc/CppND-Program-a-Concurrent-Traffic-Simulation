@@ -17,7 +17,9 @@ T MessageQueue<T>::receive()
     // The received object should then be returned by the receive function. 
     std::unique_lock<std::mutex> lck(_mtx);
     _condition.wait(lck);
-    return std::move(_queue.pop_front());
+    auto mg = std::move(_queue.front());
+    _queue.pop_front();
+    return mg; 
 }
 
 template <typename T>
@@ -42,6 +44,10 @@ void TrafficLight::waitForGreen()
     // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop 
     // runs and repeatedly calls the receive function on the message queue. 
     // Once it receives TrafficLightPhase::green, the method returns.
+    while(1){
+        if (_msgLight.receive()==TrafficLightPhase::green)
+            break;
+    }
 }
 
 TrafficLightPhase TrafficLight::getCurrentPhase()
@@ -68,6 +74,7 @@ void TrafficLight::cycleThroughPhases()
     steady_clock::time_point t1;
     static std::default_random_engine e;    // to ensure that everytime one uses the next value from this random seeds
     static std::uniform_int_distribution<unsigned> u(4000, 6000);
+
     while (1){
         t1 = steady_clock::now();
         std::this_thread::sleep_for(milliseconds{u(e)});
