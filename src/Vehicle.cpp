@@ -1,8 +1,11 @@
 #include <iostream>
 #include <random>
+#include <chrono>
 #include "Street.h"
 #include "Intersection.h"
 #include "Vehicle.h"
+
+using std::chrono::milliseconds;
 
 Vehicle::Vehicle()
 {
@@ -125,5 +128,6 @@ void Vehicle::drive()
             // reset stop watch for next cycle
             lastUpdate = std::chrono::system_clock::now();
         }
+        std::this_thread::sleep_for(milliseconds{1});
     } // eof simulation loop
 }
